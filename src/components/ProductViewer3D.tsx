@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Stage, OrbitControls, useGLTF, Html } from "@react-three/drei";
+import { Stage, OrbitControls, useGLTF } from "@react-three/drei";
 import { PRODUCTS } from "@/lib/constants";
 import Reveal from "./Reveal";
 
@@ -11,39 +11,6 @@ const viewerProducts = PRODUCTS.filter((p) => p.model);
 function Model({ url }: { url: string }) {
   const { scene } = useGLTF(url);
   return <primitive object={scene} />;
-}
-
-// Preload all models
-viewerProducts.forEach((p) => {
-  if (p.model) useGLTF.preload(p.model);
-});
-
-function FloatingTags({ tags }: { tags: string[] }) {
-  const positions: [number, number, number][] = [
-    [-2, 1.5, 0],
-    [2, 1.5, 0],
-    [-2, -1, 0],
-    [2, -1, 0],
-  ];
-
-  return (
-    <>
-      {tags.slice(0, 4).map((tag, i) => (
-        <Html key={tag} position={positions[i]} center>
-          <span
-            className="border border-brand-gold text-brand-gold px-2 py-1 bg-brand-ink/80 whitespace-nowrap animate-tagIn"
-            style={{
-              fontSize: "10px",
-              animationDelay: `${i * 0.12}s`,
-              animationFillMode: "backwards",
-            }}
-          >
-            {tag}
-          </span>
-        </Html>
-      ))}
-    </>
-  );
 }
 
 function LoadingFallback() {
@@ -58,6 +25,18 @@ export default function ProductViewer3D() {
   const [activeIdx, setActiveIdx] = useState(0);
   const active = viewerProducts[activeIdx];
 
+  // Preload models on client only
+  useEffect(() => {
+    viewerProducts.forEach((p) => {
+      if (p.model) useGLTF.preload(p.model);
+    });
+  }, []);
+
+  if (!active) return null;
+
+  const tagPositions = ["top-4 left-4", "top-4 right-4", "bottom-14 left-4", "bottom-14 right-4"];
+  const tagColors = ["#4CAF50", "#C6A45C", "#5B9BD5", "#B83A2E"];
+
   return (
     <section
       id="viewer"
@@ -70,58 +49,86 @@ export default function ProductViewer3D() {
       <div className="px-4 md:px-8 mb-8">
         <Reveal>
           <div className="flex items-baseline gap-4 mb-2">
-            <span className="text-brand-gold font-georgia text-3xl font-bold">
-              02
-            </span>
+            <span className="text-brand-gold font-serif text-3xl font-bold italic">02</span>
             <h2 className="font-serif font-bold text-2xl md:text-3xl text-brand-white">
-              3D 產品展示
+              360° 產品展示
             </h2>
           </div>
           <p className="text-brand-faint text-sm font-light max-w-md">
-            360 度旋轉檢視，感受塗料質感
+            拖曳旋轉 ・ 點擊切換產品
           </p>
         </Reveal>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6 px-4 md:px-8">
-        {/* 3D Canvas */}
-        <div className="flex-1 relative" style={{ minHeight: "400px" }}>
+      <div className="flex flex-col md:flex-row gap-6 px-4 md:px-8 max-w-6xl mx-auto">
+        {/* 3D Canvas + HTML overlay tags */}
+        <div className="flex-1 relative border border-brand-gold/10" style={{ minHeight: "380px" }}>
           <Suspense fallback={<LoadingFallback />}>
-            <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-              <Stage environment="city" intensity={0.6}>
+            <Canvas camera={{ position: [0, 1.5, 4.5], fov: 35 }} shadows>
+              <Stage environment="city" intensity={0.5} adjustCamera={false}>
                 <Model url={active.model!} />
-                <FloatingTags tags={active.tags} />
               </Stage>
               <OrbitControls
                 autoRotate
-                autoRotateSpeed={1.5}
+                autoRotateSpeed={2}
                 enableZoom={false}
                 enablePan={false}
+                minPolarAngle={Math.PI / 4}
+                maxPolarAngle={Math.PI / 1.8}
               />
             </Canvas>
           </Suspense>
-          <p className="absolute bottom-2 left-1/2 -translate-x-1/2 text-brand-muted text-xs font-sans">
-            拖曳旋轉模型
-          </p>
+
+          {/* 4D floating tags (HTML overlay, outside Canvas) */}
+          {active.tags.slice(0, 4).map((tag, i) => (
+            <div
+              key={`${activeIdx}-${i}`}
+              className={`absolute ${tagPositions[i]} px-2.5 py-1 bg-black/60 backdrop-blur-sm text-[10px] font-semibold tracking-wider flex items-center gap-1.5`}
+              style={{
+                border: `1px solid ${tagColors[i % 4]}55`,
+                color: tagColors[i % 4],
+                animation: `tagIn 0.4s ease ${0.3 + i * 0.12}s both`,
+              }}
+            >
+              <span
+                className="w-1 h-1"
+                style={{ background: tagColors[i % 4] }}
+              />
+              {tag}
+            </div>
+          ))}
+
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-brand-faint text-[10px] tracking-widest">
+            ↔ 拖曳旋轉
+          </div>
         </div>
 
         {/* Product selector */}
         <div className="flex md:flex-col gap-[3px] overflow-x-auto md:overflow-visible hide-scrollbar">
           {viewerProducts.map((product, i) => (
             <button
-              key={product.id}
+              key={i}
               onClick={() => setActiveIdx(i)}
               className={`flex-shrink-0 px-4 py-3 text-left transition-colors duration-200 min-w-[140px] md:min-w-[200px] ${
                 activeIdx === i
-                  ? "bg-brand-gold text-brand-ink"
-                  : "bg-brand-steel text-brand-faint hover:bg-brand-raw"
+                  ? "bg-brand-gold/10 border-l-[3px] border-brand-gold"
+                  : "bg-brand-steel border-l-[3px] border-transparent hover:bg-brand-raw"
               }`}
             >
-              <span className="block text-xs tracking-widest font-sans mb-1">
+              <div
+                className="w-8 h-8 mb-2"
+                style={{ background: product.color }}
+              />
+              <span className="block text-xs tracking-widest font-sans mb-1"
+                style={{ color: activeIdx === i ? "#F7F4EF" : "#B5AFA3" }}>
                 {product.brandEn}
               </span>
-              <span className="block font-serif font-bold text-sm">
-                {product.name}
+              <span className="block font-serif font-bold text-sm"
+                style={{ color: activeIdx === i ? "#F7F4EF" : "#C8C1B4" }}>
+                {product.brand} {product.name}
+              </span>
+              <span className="block text-brand-faint text-[10px] tracking-wider mt-1">
+                {product.tags.join(" ・ ")}
               </span>
             </button>
           ))}
