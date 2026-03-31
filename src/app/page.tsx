@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import InfoBar from "@/components/InfoBar";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
@@ -9,6 +10,11 @@ import CtaBand from "@/components/CtaBand";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
+const ProductViewer3D = dynamic(
+  () => import("@/components/ProductViewer3D"),
+  { ssr: false, loading: () => <div style={{ height: 400, background: "#0D0D0D" }} /> }
+);
+
 export default function Home() {
   return (
     <>
@@ -17,6 +23,7 @@ export default function Home() {
       <Hero />
       <Marquee />
       <Products />
+      <ProductViewer3D />
       <Engineering />
       <Portfolio />
       <CtaBand />

@@ -17,16 +17,6 @@
     "react-dom": "^18",
     "three": "^0.183.2"
   },
-  "overrides": {
-    "@react-three/fiber": {
-      "react": "$react",
-      "react-dom": "$react-dom"
-    },
-    "@react-three/drei": {
-      "react": "$react",
-      "react-dom": "$react-dom"
-    }
-  },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
