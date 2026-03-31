@@ -15,6 +15,11 @@ const ProductViewer3D = dynamic(
   { ssr: false, loading: () => <div style={{ height: 400, background: "#0D0D0D" }} /> }
 );
 
+const ARWallPainter = dynamic(
+  () => import("@/components/ARWallPainter"),
+  { ssr: false }
+);
+
 export default function Home() {
   return (
     <>
@@ -24,6 +29,7 @@ export default function Home() {
       <Marquee />
       <Products />
       <ProductViewer3D />
+      <ARWallPainter />
       <Engineering />
       <Portfolio />
       <CtaBand />
