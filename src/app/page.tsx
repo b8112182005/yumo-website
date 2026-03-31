@@ -10,6 +10,11 @@ import CtaBand from "@/components/CtaBand";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
+const ARWallPainter = dynamic(
+  () => import("@/components/ARWallPainter"),
+  { ssr: false }
+);
+
 const ProductViewer3D = dynamic(
   () => import("@/components/ProductViewer3D"),
   {
@@ -41,6 +46,7 @@ export default function Home() {
       <Marquee />
       <Products />
       <ProductViewer3D />
+      <ARWallPainter />
       <Engineering />
       <Portfolio />
       <CtaBand />
