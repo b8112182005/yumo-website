@@ -47,12 +47,13 @@ function Scene3D({ modelUrl, onError }: { modelUrl: string; onError: () => void 
             OrbitControls: drei.OrbitControls,
             useGLTF: drei.useGLTF,
           });
-          // Preload all models
+          // Preload all models (Draco compressed)
           viewerProducts.forEach((p) => {
             if (p.model) {
               try { drei.useGLTF.preload(p.model); } catch {}
             }
           });
+          console.log("[3D] R3F engine loaded, models preloading");
         }
       })
       .catch(() => {
@@ -74,7 +75,9 @@ function Scene3D({ modelUrl, onError }: { modelUrl: string; onError: () => void 
   const { Canvas, Stage, OrbitControls, useGLTF } = R3F;
 
   function Model({ url }: { url: string }) {
+    console.log("[3D] Loading model:", url);
     const { scene } = useGLTF(url);
+    console.log("[3D] Model loaded OK:", url);
     return <primitive object={scene} />;
   }
 

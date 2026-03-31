@@ -18,6 +18,7 @@ const WALL_COLORS = [
 export default function ARWallPainter() {
   const [selectedColor, setSelectedColor] = useState(WALL_COLORS[0]);
   const [cameraActive, setCameraActive] = useState(false);
+  const [error, setError] = useState("");
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
@@ -70,9 +71,14 @@ export default function ARWallPainter() {
   }, []);
 
   async function startCamera() {
+    setError("");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
         audio: false,
       });
       if (videoRef.current) {
@@ -81,8 +87,19 @@ export default function ARWallPainter() {
         setCameraActive(true);
         animRef.current = requestAnimationFrame(processFrame);
       }
-    } catch {
-      alert("無法開啟相機，請確認已授權相機權限");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const name = err instanceof Error ? err.name : "";
+      console.error("Camera error:", err);
+      if (name === "NotAllowedError") {
+        setError("相機權限被拒絕，請在瀏覽器設定中允許");
+      } else if (name === "NotFoundError") {
+        setError("找不到相機裝置");
+      } else if (name === "NotReadableError") {
+        setError("相機被其他 App 佔用中");
+      } else {
+        setError("相機開啟失敗：" + msg);
+      }
     }
   }
 
@@ -149,6 +166,9 @@ export default function ARWallPainter() {
               <p className="text-brand-faint text-[11px] tracking-wider">
                 將相機對準牆壁，即時預覽 {selectedColor.name} 上漆效果
               </p>
+              {error && (
+                <p className="text-red-400 text-[12px] mt-3 px-4 text-center">{error}</p>
+              )}
             </div>
           ) : (
             <>
