@@ -12,7 +12,24 @@ import Footer from "@/components/Footer";
 
 const ProductViewer3D = dynamic(
   () => import("@/components/ProductViewer3D"),
-  { ssr: false }
+  {
+    ssr: false,
+    loading: () => (
+      <section className="bg-[#0D0D0D] py-24 px-5 md:px-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-[#C6A45C] text-3xl font-bold italic font-serif">02</div>
+          <h2 className="font-serif text-2xl md:text-3xl font-bold tracking-wider mt-2 text-[#E8E3DA]">
+            360° 產品展示
+          </h2>
+          <div className="h-[320px] md:h-[420px] mt-8 border border-[#C6A45C]/10 flex items-center justify-center">
+            <div className="text-[#B5AFA3] text-sm tracking-widest animate-pulse">
+              載入 3D 模型中...
+            </div>
+          </div>
+        </div>
+      </section>
+    ),
+  }
 );
 
 export default function Home() {
@@ -23,7 +40,7 @@ export default function Home() {
       <Hero />
       <Marquee />
       <Products />
-      {/* <ProductViewer3D /> */}
+      <ProductViewer3D />
       <Engineering />
       <Portfolio />
       <CtaBand />
