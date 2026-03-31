@@ -6,12 +6,13 @@ export const BRAND = {
   subtitle: "嚴選全球塗料，專業施工團隊",
   description:
     "瑀墨塗料精選全球頂級品牌塗料，從居家空間到商業工程，提供最專業的塗料選品與施工服務。我們相信，每一面牆都值得被認真對待。",
-  address: "桃園市龜山區萬壽路二段 939 巷 31 號",
-  phone: "0906-372-777",
-  line: "@yumo-paint",
-  lineUrl: "https://lin.ee/example",
-  taxId: "97aboratory",
-  copyright: "© 2024 瑀墨塗料 YUMO PAINT. All rights reserved.",
+  address: "台中市北屯區環中路一段519號",
+  phone: "0930-691-134",
+  line: "@yumopaint",
+  lineUrl: "https://lin.ee/yumopaint",
+  taxId: "60309610",
+  hours: "07:30-18:00（週一至週六）",
+  copyright: "© 2026 瑀墨塗料 YUMO PAINT CO. All rights reserved.",
 };
 
 export interface Product {
@@ -22,7 +23,6 @@ export interface Product {
   spec: string;
   color: string;
   tags: string[];
-  model?: string;
   image: string;
 }
 
@@ -35,7 +35,6 @@ export const PRODUCTS: Product[] = [
     spec: "5L / 啞光",
     color: "#E60012",
     tags: ["抗甲醛", "零 VOC", "防霉", "兒童安全"],
-    model: "/models/nippon.glb",
     image: "/images/nippon.png",
   },
   {
@@ -46,7 +45,6 @@ export const PRODUCTS: Product[] = [
     spec: "5L / 柔光",
     color: "#003DA5",
     tags: ["竹炭淨化", "抗菌", "超低 VOC", "耐擦洗"],
-    model: "/models/dulux.glb",
     image: "/images/dulux.jpg",
   },
   {
@@ -57,7 +55,6 @@ export const PRODUCTS: Product[] = [
     spec: "5GL / 平光",
     color: "#00A651",
     tags: ["台灣製造", "高遮蓋", "防水", "經濟實惠"],
-    model: "/models/rainbow.glb",
     image: "/images/rainbow.jpg",
   },
   {
@@ -68,7 +65,6 @@ export const PRODUCTS: Product[] = [
     spec: "1GL / 蛋殼光",
     color: "#B8860B",
     tags: ["色彩精準", "高耐久", "零 VOC", "設計師首選"],
-    model: "/models/benjamin.glb",
     image: "/images/benjamin.jpg",
   },
 ];

@@ -22,32 +22,30 @@ export default function ARWallPainter() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
-  const colorRef = useRef(selectedColor);
+  const selectedColorRef = useRef(selectedColor);
 
-  // Keep colorRef in sync
   useEffect(() => {
-    colorRef.current = selectedColor;
+    selectedColorRef.current = selectedColor;
   }, [selectedColor]);
 
-  const processFrame = useCallback(() => {
+  const processFrameLoop = useCallback(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas || video.readyState < 2) {
-      animRef.current = requestAnimationFrame(processFrame);
-      return;
-    }
+    if (!video || !canvas || video.paused || video.ended) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+    }
+
     ctx.drawImage(video, 0, 0);
 
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
-
-    const hex = colorRef.current.hex;
+    const hex = selectedColorRef.current.hex;
     const cr = parseInt(hex.slice(1, 3), 16);
     const cg = parseInt(hex.slice(3, 5), 16);
     const cb = parseInt(hex.slice(5, 7), 16);
@@ -57,17 +55,17 @@ export default function ARWallPainter() {
       const brightness = (pr + pg + pb) / 3;
       const maxC = Math.max(pr, pg, pb);
       const minC = Math.min(pr, pg, pb);
-      const saturation = maxC === 0 ? 0 : (maxC - minC) / maxC;
+      const sat = maxC === 0 ? 0 : (maxC - minC) / maxC;
 
-      if (brightness > 130 && saturation < 0.3) {
-        data[i] = pr * 0.6 + cr * 0.4;
-        data[i + 1] = pg * 0.6 + cg * 0.4;
-        data[i + 2] = pb * 0.6 + cb * 0.4;
+      if (brightness > 120 && sat < 0.35) {
+        data[i] = pr * 0.55 + cr * 0.45;
+        data[i + 1] = pg * 0.55 + cg * 0.45;
+        data[i + 2] = pb * 0.55 + cb * 0.45;
       }
     }
 
     ctx.putImageData(imageData, 0, 0);
-    animRef.current = requestAnimationFrame(processFrame);
+    animRef.current = requestAnimationFrame(processFrameLoop);
   }, []);
 
   async function startCamera() {
@@ -81,18 +79,32 @@ export default function ARWallPainter() {
         },
         audio: false,
       });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-        setCameraActive(true);
-        animRef.current = requestAnimationFrame(processFrame);
-      }
+
+      const video = videoRef.current;
+      if (!video) return;
+
+      video.setAttribute("playsinline", "true");
+      video.setAttribute("muted", "true");
+      video.muted = true;
+      video.playsInline = true;
+      video.srcObject = stream;
+
+      video.onloadedmetadata = async () => {
+        try {
+          await video.play();
+          setCameraActive(true);
+          animRef.current = requestAnimationFrame(processFrameLoop);
+        } catch (playErr: unknown) {
+          const msg = playErr instanceof Error ? playErr.message : String(playErr);
+          setError("影片播放失敗：" + msg);
+        }
+      };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       const name = err instanceof Error ? err.name : "";
       console.error("Camera error:", err);
-      if (name === "NotAllowedError") {
-        setError("相機權限被拒絕，請在瀏覽器設定中允許");
+      if (name === "NotAllowedError" || msg.includes("Permission")) {
+        setError("請允許相機權限後重試");
       } else if (name === "NotFoundError") {
         setError("找不到相機裝置");
       } else if (name === "NotReadableError") {
@@ -117,9 +129,7 @@ export default function ARWallPainter() {
   return (
     <section className="bg-brand-cream py-20 px-5 md:px-12">
       <div className="max-w-5xl mx-auto">
-        <div className="text-brand-gold text-[10px] tracking-[4px] font-bold">
-          AR PREVIEW
-        </div>
+        <div className="text-brand-gold text-[10px] tracking-[4px] font-bold">AR PREVIEW</div>
         <h2 className="font-serif text-[28px] md:text-[38px] font-black tracking-[4px] mt-2">
           AR 牆壁色彩預覽
         </h2>
@@ -127,7 +137,6 @@ export default function ARWallPainter() {
           選擇顏色 → 開啟相機 → 對準牆壁即時預覽上漆效果
         </p>
 
-        {/* Color picker */}
         <div className="flex gap-3 flex-wrap mb-6">
           {WALL_COLORS.map((color) => (
             <button
@@ -139,21 +148,23 @@ export default function ARWallPainter() {
                 className="w-10 h-10 border-2 transition-all"
                 style={{
                   background: color.hex,
-                  borderColor:
-                    selectedColor.hex === color.hex ? "#C6A45C" : "transparent",
-                  transform:
-                    selectedColor.hex === color.hex ? "scale(1.15)" : "scale(1)",
+                  borderColor: selectedColor.hex === color.hex ? "#C6A45C" : "transparent",
+                  transform: selectedColor.hex === color.hex ? "scale(1.15)" : "scale(1)",
                 }}
               />
-              <span className="text-[9px] text-brand-muted tracking-wider">
-                {color.name}
-              </span>
+              <span className="text-[9px] text-brand-muted tracking-wider">{color.name}</span>
             </button>
           ))}
         </div>
 
-        {/* Camera / AR display */}
         <div className="relative aspect-video bg-brand-ink overflow-hidden">
+          <video
+            ref={videoRef}
+            playsInline
+            muted
+            autoPlay
+            style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+          />
           {!cameraActive ? (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <div className="text-6xl">📸</div>
@@ -167,12 +178,11 @@ export default function ARWallPainter() {
                 將相機對準牆壁，即時預覽 {selectedColor.name} 上漆效果
               </p>
               {error && (
-                <p className="text-red-400 text-[12px] mt-3 px-4 text-center">{error}</p>
+                <p className="text-red-400 text-[12px] mt-2 px-4 text-center">{error}</p>
               )}
             </div>
           ) : (
             <>
-              <video ref={videoRef} autoPlay playsInline className="hidden" />
               <canvas ref={canvasRef} className="w-full h-full object-cover" />
               <div className="absolute top-4 left-4 px-3 py-1 bg-black/60 backdrop-blur-sm">
                 <span className="text-[11px] text-brand-gold tracking-wider">
