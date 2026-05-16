@@ -6,10 +6,10 @@ export const BRAND = {
   subtitle: "嚴選代理 · 全球品牌",
   description:
     "瑀墨塗料嚴選全球頂級品牌，代理立邦、得利、班傑明摩爾等六大國際品牌，為工程商、設計師與建設公司提供最完善的塗料採購方案。每一次選擇，都是品質的承諾。",
-  address: "台中市北屯區平和里旅順路一段152號2樓",
+  address: "台中市北屯區環中路一段519號",
   phone: "0930-691-134",
-  line: "@yumo_paint",
-  lineUrl: "https://lin.ee/yumo_paint",
+  line: "@409nbmsz",
+  lineUrl: "https://lin.ee/409nbmsz",
   taxId: "60309610",
   hours: "09:00 – 18:00（週一至週六）",
   copyright: "© 2026 瑀墨塗料有限公司 YUMO PAINT CO., LTD. All rights reserved.",
