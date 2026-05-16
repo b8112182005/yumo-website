@@ -3,18 +3,14 @@ import InfoBar from "@/components/InfoBar";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
-import Products from "@/components/Products";
 import Brands from "@/components/Brands";
+import Products from "@/components/Products";
+import ShowroomTour from "@/components/ShowroomTour";
 import Engineering from "@/components/Engineering";
 import Portfolio from "@/components/Portfolio";
 import CtaBand from "@/components/CtaBand";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-
-const ProductViewer3D = dynamic(
-  () => import("@/components/ProductViewer3D"),
-  { ssr: false, loading: () => <div style={{ height: 400, background: "#0D0D0D" }} /> }
-);
 
 const ARWallPainter = dynamic(
   () => import("@/components/ARWallPainter"),
@@ -30,7 +26,7 @@ export default function Home() {
       <Marquee />
       <Brands />
       <Products />
-      <ProductViewer3D />
+      <ShowroomTour />
       <ARWallPainter />
       <Engineering />
       <Portfolio />

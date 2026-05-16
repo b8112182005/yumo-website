@@ -137,7 +137,7 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { label: "嚴選塗料", href: "#products", num: "01" },
-  { label: "3D 展示", href: "#viewer", num: "02" },
+  { label: "展間導覽", href: "#showroom", num: "02" },
   { label: "選品服務", href: "#selection", num: "03" },
   { label: "合作案例", href: "#portfolio", num: "04" },
   { label: "聯絡我們", href: "#contact", num: "05" },
