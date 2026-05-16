@@ -2,8 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   border-radius: 0 !important;
+}
+
+/* GPU-accelerate animated elements */
+[data-motion], .motion-div {
+  will-change: transform, opacity;
 }
 
 /* Hide default cursor on desktop */

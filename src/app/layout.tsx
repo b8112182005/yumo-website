@@ -19,6 +19,7 @@ const notoSansTC = Noto_Sans_TC({
 
 const LoadingScreen = dynamic(() => import("@/components/LoadingScreen"), { ssr: false });
 const CustomCursor = dynamic(() => import("@/components/CustomCursor"), { ssr: false });
+const ScrollProgress = dynamic(() => import("@/components/ScrollProgress"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "瑀墨塗料 YUMO PAINT — 嚴選全球品牌 · 專業塗料代理",
@@ -37,6 +38,7 @@ export default function RootLayout({
       >
         <LoadingScreen />
         <CustomCursor />
+        <ScrollProgress />
         {children}
       </body>
     </html>
