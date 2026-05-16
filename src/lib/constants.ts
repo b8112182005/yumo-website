@@ -3,16 +3,16 @@ export const BRAND = {
   nameEn: "YUMO PAINT",
   slogan: "The beauty of restraint, the power of paint.",
   sloganZh: "漆之美，墨之韻",
-  subtitle: "嚴選全球塗料，專業施工團隊",
+  subtitle: "嚴選代理 · 全球品牌",
   description:
-    "瑀墨塗料精選全球頂級品牌塗料，從居家空間到商業工程，提供最專業的塗料選品與施工服務。我們相信，每一面牆都值得被認真對待。",
-  address: "台中市北屯區環中路一段519號",
+    "瑀墨塗料嚴選全球頂級品牌，代理立邦、得利、班傑明摩爾等六大國際品牌，為工程商、設計師與建設公司提供最完善的塗料採購方案。每一次選擇，都是品質的承諾。",
+  address: "台中市北屯區平和里旅順路一段152號2樓",
   phone: "0930-691-134",
-  line: "@yumopaint",
-  lineUrl: "https://lin.ee/yumopaint",
+  line: "@yumo_paint",
+  lineUrl: "https://lin.ee/yumo_paint",
   taxId: "60309610",
-  hours: "07:30-18:00（週一至週六）",
-  copyright: "© 2026 瑀墨塗料 YUMO PAINT CO. All rights reserved.",
+  hours: "09:00 – 18:00（週一至週六）",
+  copyright: "© 2026 瑀墨塗料有限公司 YUMO PAINT CO., LTD. All rights reserved.",
 };
 
 export interface Product {
@@ -87,7 +87,7 @@ export const EXTRA_PRODUCTS: Product[] = [
     name: "Forest 雅緻木器漆",
     spec: "0.75L / 亮光",
     color: "#5B2C6F",
-    tags: ["丹麥皇室", "木器專用", "環保認證", "高硬度"],
+    tags: ["丹麥皇室御用", "木器專用", "環保認證", "高硬度"],
     image: "/images/dulux.jpg",
   },
 ];
@@ -100,25 +100,34 @@ export interface PortfolioItem {
 }
 
 export const PORTFOLIO: PortfolioItem[] = [
-  { id: "p1", category: "住宅", title: "桃園中路特區 — 全室重新塗裝", year: "2024" },
-  { id: "p2", category: "商空", title: "台北大安區咖啡廳 — 藝術塗料施工", year: "2024" },
-  { id: "p3", category: "住宅", title: "新竹竹北 — 透天別墅外牆翻新", year: "2023" },
-  { id: "p4", category: "公設", title: "桃園社區大樓 — 公共空間粉刷", year: "2023" },
-  { id: "p5", category: "商空", title: "中壢工業區 — 廠房地坪 EPOXY", year: "2023" },
-  { id: "p6", category: "住宅", title: "林口新市鎮 — 新成屋全室塗裝", year: "2022" },
+  { id: "p1", category: "住宅", title: "桃園中路特區豪宅建案 — 班傑明摩爾全室塗料供應", year: "2024" },
+  { id: "p2", category: "商空", title: "台北大安區咖啡廳 — 得利藝術塗料批量採購", year: "2024" },
+  { id: "p3", category: "住宅", title: "新竹竹北透天別墅 — 佐敦進口塗料全系列供應", year: "2023" },
+  { id: "p4", category: "公設", title: "桃園社區大樓 — 立邦公共空間塗料大宗供應", year: "2023" },
+  { id: "p5", category: "工業", title: "中壢工業區廠房 — EPOXY 地坪材料供應", year: "2023" },
+  { id: "p6", category: "住宅", title: "林口新市鎮建案 — 虹牌新成屋全室塗料供應", year: "2022" },
 ];
 
-export const ENGINEERING = {
-  title: "專業工程施作",
+export const SELECTION = {
+  title: "選品服務",
   description:
-    "瑀墨塗料擁有經驗豐富的施工團隊，從色彩規劃到完工交付，每一個環節都嚴格把關。無論是住家翻新、商業空間或大型工程，我們都能提供最完善的解決方案。",
+    "瑀墨塗料以代理商視角嚴格把關每一個品牌，從品牌認證到倉儲配送，為您提供最省心的採購體驗。無論是小批量試樣或大宗工程用量，我們都能快速回應。",
   services: [
-    { label: "室內粉刷", desc: "居家、辦公、商業空間全室塗裝" },
-    { label: "外牆翻新", desc: "防水塗料施工、外牆拉皮" },
-    { label: "特殊塗裝", desc: "藝術塗料、仿石漆、EPOXY 地坪" },
-    { label: "色彩諮詢", desc: "專業配色建議、現場打樣" },
+    { label: "品牌代理", desc: "全球六大品牌嚴選，保證原廠授權正品" },
+    { label: "大宗採購", desc: "工程批量採購，提供專屬優惠報價" },
+    { label: "色彩諮詢", desc: "專業配色顧問，協助設計師與業主選色" },
+    { label: "快速配送", desc: "台中倉儲備貨，全台快速到貨服務" },
   ],
 };
+
+export const BRAND_PARTNERS = [
+  { name: "NIPPON", zh: "立邦", country: "Japan" },
+  { name: "DULUX", zh: "得利", country: "Netherlands" },
+  { name: "RAINBOW", zh: "虹牌", country: "Taiwan" },
+  { name: "BENJAMIN MOORE", zh: "班傑明摩爾", country: "U.S.A." },
+  { name: "JOTUN", zh: "佐敦", country: "Norway" },
+  { name: "FLÜGGER", zh: "福樂閣", country: "Denmark" },
+];
 
 export interface NavItem {
   label: string;
@@ -129,7 +138,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { label: "嚴選塗料", href: "#products", num: "01" },
   { label: "3D 展示", href: "#viewer", num: "02" },
-  { label: "工程服務", href: "#engineering", num: "03" },
-  { label: "施工實績", href: "#portfolio", num: "04" },
+  { label: "選品服務", href: "#selection", num: "03" },
+  { label: "合作案例", href: "#portfolio", num: "04" },
   { label: "聯絡我們", href: "#contact", num: "05" },
 ];

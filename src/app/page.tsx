@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
 import Products from "@/components/Products";
+import Brands from "@/components/Brands";
 import Engineering from "@/components/Engineering";
 import Portfolio from "@/components/Portfolio";
 import CtaBand from "@/components/CtaBand";
@@ -27,6 +28,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Marquee />
+      <Brands />
       <Products />
       <ProductViewer3D />
       <ARWallPainter />

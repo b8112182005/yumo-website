@@ -9,10 +9,10 @@ export default function CtaBand() {
         <div className="flex flex-wrap items-center justify-between gap-6">
           <div>
             <h3 className="font-serif font-bold text-xl md:text-2xl text-brand-ink mb-1">
-              讓我們為您的空間上色
+              大宗採購，歡迎詢價
             </h3>
             <p className="text-brand-ink/70 text-sm font-light">
-              免費到府丈量估價，專業配色建議
+              工程商、設計師專屬報價，快速回覆
             </p>
           </div>
           <a

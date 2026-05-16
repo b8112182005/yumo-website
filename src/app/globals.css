@@ -6,9 +6,27 @@
   border-radius: 0 !important;
 }
 
+/* Hide default cursor on desktop */
+@media (pointer: fine) {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+}
+
 ::selection {
   background-color: #C6A45C;
   color: #0D0D0D;
+}
+
+/* Film grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.028;
+  pointer-events: none;
+  z-index: 9998;
 }
 
 @keyframes tagIn {
@@ -23,36 +41,34 @@
 }
 
 @keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
 }
 
 @keyframes bounce-line {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(8px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
 }
 
 @keyframes seal-pop {
-  0% {
-    transform: rotate(-2deg) scale(0);
-    opacity: 0;
-  }
-  60% {
-    transform: rotate(-2deg) scale(1.15);
-    opacity: 1;
-  }
-  100% {
-    transform: rotate(-2deg) scale(1);
-    opacity: 1;
-  }
+  0% { transform: rotate(-2deg) scale(0); opacity: 0; }
+  60% { transform: rotate(-2deg) scale(1.15); opacity: 1; }
+  100% { transform: rotate(-2deg) scale(1); opacity: 1; }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }
 
 @layer utilities {
@@ -67,12 +83,23 @@
     animation: tagIn 0.35s ease-out forwards;
   }
   .animate-marquee {
-    animation: marquee 22s linear infinite;
+    animation: marquee 28s linear infinite;
+  }
+  .animate-marquee-reverse {
+    animation: marquee-reverse 28s linear infinite;
   }
   .animate-bounce-line {
     animation: bounce-line 1.8s ease-in-out infinite;
   }
   .animate-seal-pop {
     animation: seal-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .text-shimmer {
+    background: linear-gradient(90deg, #C6A45C 0%, #F0D080 40%, #C6A45C 60%, #9A7B3A 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s linear infinite;
   }
 }
