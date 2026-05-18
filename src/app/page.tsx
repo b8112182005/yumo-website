@@ -6,6 +6,7 @@ import Marquee from "@/components/Marquee";
 import Brands from "@/components/Brands";
 import Products from "@/components/Products";
 import ShowroomTour from "@/components/ShowroomTour";
+import ColorWall from "@/components/ColorWall";
 import Engineering from "@/components/Engineering";
 import Portfolio from "@/components/Portfolio";
 import CtaBand from "@/components/CtaBand";
@@ -27,6 +28,7 @@ export default function Home() {
       <Brands />
       <Products />
       <ShowroomTour />
+      <ColorWall />
       <ARWallPainter />
       <Engineering />
       <Portfolio />

@@ -61,6 +61,7 @@ export default function ShowroomTour() {
   const [roomIdx, setRoomIdx] = useState(0);
   const [direction, setDirection] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
 
   // Mouse motion values
   const rawX = useMotionValue(0);
@@ -91,6 +92,17 @@ export default function ShowroomTour() {
     setRoomIdx(idx);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const delta = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(delta) > 48) {
+      goTo((roomIdx + (delta > 0 ? 1 : -1) + ROOMS.length) % ROOMS.length);
+    }
+  };
+
   const room = ROOMS[roomIdx];
 
   return (
@@ -119,6 +131,8 @@ export default function ShowroomTour() {
         style={{ height: "clamp(340px, 52vh, 560px)" }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
