@@ -1,7 +1,7 @@
 "use client";
 
 import { BRAND_PARTNERS } from "@/lib/constants";
-import Reveal from "./Reveal";
+import TextReveal from "./TextReveal";
 
 export default function Brands() {
   const doubled = [...BRAND_PARTNERS, ...BRAND_PARTNERS];
@@ -9,14 +9,16 @@ export default function Brands() {
   return (
     <section className="py-20 bg-brand-ink overflow-hidden">
       <div className="px-4 md:px-8 mb-10">
-        <Reveal>
+        <TextReveal>
           <p className="text-brand-gold tracking-[0.35em] text-[10px] font-sans font-light mb-2">
             AUTHORIZED DISTRIBUTION
           </p>
+        </TextReveal>
+        <TextReveal delay={0.1}>
           <h2 className="font-serif font-black text-brand-white text-2xl md:text-3xl tracking-wide">
             代理品牌
           </h2>
-        </Reveal>
+        </TextReveal>
       </div>
 
       {/* Marquee row */}

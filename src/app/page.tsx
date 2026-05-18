@@ -4,7 +4,9 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
 import Brands from "@/components/Brands";
+import StatsBand from "@/components/StatsBand";
 import Products from "@/components/Products";
+import Statement from "@/components/Statement";
 import ShowroomTour from "@/components/ShowroomTour";
 import ColorWall from "@/components/ColorWall";
 import Engineering from "@/components/Engineering";
@@ -26,7 +28,9 @@ export default function Home() {
       <Hero />
       <Marquee />
       <Brands />
+      <StatsBand />
       <Products />
+      <Statement />
       <ShowroomTour />
       <ColorWall />
       <ARWallPainter />
