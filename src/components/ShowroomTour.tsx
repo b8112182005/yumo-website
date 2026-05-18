@@ -1,116 +1,91 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const ROOMS = [
+interface Room {
+  id: string;
+  num: string;
+  label: string;
+  subtitle: string;
+  desc: string;
+  tags: string[];
+  accentColor: string;
+  hotspot: { x: number; y: number };
+  fillPath: string;
+}
+
+const ROOMS: Room[] = [
   {
-    id: "entry",
+    id: "showroom",
     num: "01",
-    label: "展示廳",
-    title: "嚴選品牌",
+    label: "品牌展示廳",
     subtitle: "BRAND SHOWROOM",
-    desc: "親臨感受六大國際品牌的色彩世界，專業顧問一對一為您解說塗料特性與適用場景。",
-    wallColor: "#120f08",
+    desc: "六大國際品牌實品展示，專業顧問一對一為您解說塗料特性與適用場景，免費索取色卡。",
+    tags: ["實品陳列", "免費色卡", "專業解說"],
     accentColor: "#C6A45C",
-    glowColor: "rgba(198,164,92,0.10)",
-    tags: [
-      { text: "六大品牌實品展示", x: 15, y: 32 },
-      { text: "免費色卡索取", x: 63, y: 26 },
-      { text: "專業顧問諮詢", x: 68, y: 63 },
-    ],
-    swatches: ["#E60012", "#003DA5", "#B8860B", "#1B3A5C", "#5B2C6F", "#00A651"],
+    hotspot: { x: 228, y: 145 },
+    fillPath: "M22,22 H438 V258 H22 Z",
   },
   {
-    id: "colors",
+    id: "colorwall",
     num: "02",
     label: "色彩牆",
-    title: "千色萬彩",
     subtitle: "COLOR LIBRARY",
-    desc: "超過 2,000 種色號，從 Pantone 對色到品牌專屬調色，找到專屬您空間的完美色彩。",
-    wallColor: "#060c14",
+    desc: "超過 2,000 種色號，Pantone 精準對色，電腦自動調色，找到您空間的完美色彩。",
+    tags: ["2000+ 色號", "Pantone 對色", "電腦調色"],
     accentColor: "#7EB5D4",
-    glowColor: "rgba(126,181,212,0.10)",
-    tags: [
-      { text: "2,000+ 色號", x: 13, y: 30 },
-      { text: "Pantone 精準對色", x: 60, y: 24 },
-      { text: "電腦自動調色", x: 64, y: 65 },
-    ],
-    swatches: ["#F5F5F0", "#E8D5C4", "#B0C4DE", "#ACB7AE", "#D4A5A5", "#C0B9AC"],
+    hotspot: { x: 590, y: 145 },
+    fillPath: "M442,22 H738 V258 H442 Z",
   },
   {
     id: "consult",
     num: "03",
     label: "諮詢室",
-    title: "專業建議",
-    subtitle: "CONSULTATION ZONE",
+    subtitle: "CONSULTATION",
     desc: "設計師與業主的最佳夥伴，配色規劃、工程評估、大宗採購報價，一次搞定。",
-    wallColor: "#070c08",
+    tags: ["配色規劃", "工程估價", "批量報價"],
     accentColor: "#8DC48A",
-    glowColor: "rgba(141,196,138,0.10)",
-    tags: [
-      { text: "配色規劃服務", x: 14, y: 33 },
-      { text: "批量採購報價", x: 62, y: 27 },
-      { text: "設計師合作方案", x: 61, y: 65 },
-    ],
-    swatches: ["#D4E8C4", "#A8C4A0", "#7B9E87", "#5A7A64", "#3D5C45", "#C6A45C"],
+    hotspot: { x: 119, y: 352 },
+    fillPath: "M22,262 H218 V438 H22 Z",
+  },
+  {
+    id: "mixing",
+    num: "04",
+    label: "電腦調色室",
+    subtitle: "COLOR MIXING",
+    desc: "精密電腦調色機，依客戶需求精準配出任意色號，現場即時完成，無需等待。",
+    tags: ["精準配色", "即時完成", "任意色號"],
+    accentColor: "#C4A882",
+    hotspot: { x: 329, y: 352 },
+    fillPath: "M222,262 H438 V438 H222 Z",
+  },
+  {
+    id: "storage",
+    num: "05",
+    label: "倉儲配送",
+    subtitle: "WAREHOUSE",
+    desc: "大型倉儲備貨充足，大宗採購即時出貨，台中倉庫全台快速配送，當天出庫。",
+    tags: ["大型倉儲", "即時出貨", "全台配送"],
+    accentColor: "#A0A8C4",
+    hotspot: { x: 590, y: 352 },
+    fillPath: "M442,262 H738 V438 H442 Z",
   },
 ];
 
+const W = "#3D3B37";   // wall stroke
+const WL = "#52504C";  // door / light detail
+
 export default function ShowroomTour() {
-  const [roomIdx, setRoomIdx] = useState(0);
-  const [direction, setDirection] = useState(1);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const touchStartX = useRef(0);
-
-  // Mouse motion values
-  const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-
-  // Three parallax layers — slow / mid / fast
-  const slowX = useSpring(rawX, { stiffness: 60, damping: 20 });
-  const slowY = useSpring(rawY, { stiffness: 60, damping: 20 });
-  const midX  = useSpring(rawX, { stiffness: 40, damping: 18 });
-  const midY  = useSpring(rawY, { stiffness: 40, damping: 18 });
-  const fastX = useSpring(rawX, { stiffness: 25, damping: 15 });
-  const fastY = useSpring(rawY, { stiffness: 25, damping: 15 });
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    rawX.set(((e.clientX - rect.left) / rect.width - 0.5) * 30);
-    rawY.set(((e.clientY - rect.top) / rect.height - 0.5) * 20);
-  }, [rawX, rawY]);
-
-  const handleMouseLeave = useCallback(() => {
-    rawX.set(0);
-    rawY.set(0);
-  }, [rawX, rawY]);
-
-  const goTo = (idx: number) => {
-    setDirection(idx > roomIdx ? 1 : -1);
-    setRoomIdx(idx);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const delta = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 48) {
-      goTo((roomIdx + (delta > 0 ? 1 : -1) + ROOMS.length) % ROOMS.length);
-    }
-  };
-
-  const room = ROOMS[roomIdx];
+  const [activeId, setActiveId] = useState<string | null>("showroom");
+  const active = ROOMS.find((r) => r.id === activeId) ?? null;
 
   return (
     <section id="showroom" className="py-20 bg-brand-ink overflow-hidden">
       {/* Header */}
       <div className="px-4 md:px-8 mb-8">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
@@ -121,204 +96,200 @@ export default function ShowroomTour() {
           <h2 className="font-serif font-black text-brand-white text-2xl md:text-3xl tracking-wide">
             展間導覽
           </h2>
+          <p className="text-brand-muted text-xs font-light tracking-wider mt-1">
+            點擊區域查看各展間功能 · 台中北屯展間開放參觀
+          </p>
         </motion.div>
       </div>
 
-      {/* Room viewer */}
-      <div
-        ref={containerRef}
-        className="relative mx-4 md:mx-8 overflow-hidden"
-        style={{ height: "clamp(340px, 52vh, 560px)" }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={room.id}
-            custom={direction}
-            variants={{
-              enter: (d: number) => ({ opacity: 0, x: d * 80 }),
-              center: { opacity: 1, x: 0 },
-              exit:  (d: number) => ({ opacity: 0, x: d * -80 }),
-            }}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0"
-            style={{ background: room.wallColor }}
+      {/* Floor plan */}
+      <div className="px-4 md:px-8 overflow-x-auto">
+        <motion.div
+          style={{ minWidth: "380px" }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <svg
+            viewBox="0 0 760 510"
+            width="100%"
+            preserveAspectRatio="xMidYMid meet"
           >
-            {/* Ambient glow */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{ background: `radial-gradient(ellipse at 50% 35%, ${room.glowColor} 0%, transparent 65%)` }}
+            {/* Room highlight fills */}
+            {ROOMS.map((room) => (
+              <path
+                key={room.id + "-fill"}
+                d={room.fillPath}
+                fill={activeId === room.id ? room.accentColor : "transparent"}
+                fillOpacity={activeId === room.id ? 0.07 : 0}
+                style={{ transition: "fill-opacity 0.3s" }}
+              />
+            ))}
+
+            {/* Outer wall with entrance notch */}
+            <path
+              d="M20,20 L740,20 L740,440 L430,440 L430,480 L330,480 L330,440 L20,440 Z"
+              fill="none"
+              stroke={W}
+              strokeWidth={1.5}
             />
 
-            {/* Layer 1 — background / slowest parallax */}
-            <motion.div
-              className="absolute inset-0"
-              style={{ x: slowX, y: slowY }}
-            >
-              {/* Perspective floor */}
-              <svg
-                className="absolute bottom-0 left-0 w-full"
-                style={{ height: "42%" }}
-                viewBox="0 0 1000 200"
-                preserveAspectRatio="none"
-              >
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                  <line
-                    key={`r${i}`}
-                    x1={i * 100} y1="200"
-                    x2="500" y2="0"
-                    stroke={room.accentColor}
-                    strokeOpacity="0.10"
-                    strokeWidth="0.6"
-                  />
-                ))}
-                {[30, 80, 130, 180].map((y, i) => (
-                  <line
-                    key={`h${i}`}
-                    x1={500 - 500 * (200 - y) / 200}
-                    y1={y}
-                    x2={500 + 500 * (200 - y) / 200}
-                    y2={y}
-                    stroke={room.accentColor}
-                    strokeOpacity="0.07"
-                    strokeWidth="0.5"
-                  />
-                ))}
-              </svg>
-              {/* Wall frame lines */}
-              <div className="absolute top-[28%] left-[8%] right-[8%] h-[1px] opacity-15"
-                style={{ background: room.accentColor }} />
-              <div className="absolute top-[28%] bottom-[25%] left-[8%] w-[1px] opacity-10"
-                style={{ background: room.accentColor }} />
-              <div className="absolute top-[28%] bottom-[25%] right-[8%] w-[1px] opacity-10"
-                style={{ background: room.accentColor }} />
-            </motion.div>
+            {/* Interior walls */}
+            <line x1={440} y1={20}  x2={440} y2={440} stroke={W} strokeWidth={1} />
+            <line x1={20}  y1={260} x2={740} y2={260} stroke={W} strokeWidth={1} />
+            <line x1={220} y1={260} x2={220} y2={440} stroke={W} strokeWidth={1} />
 
-            {/* Layer 2 — mid / colour swatches + title */}
-            <motion.div
-              className="absolute inset-0 flex flex-col items-center justify-center"
-              style={{ x: midX, y: midY }}
-            >
-              <div className="flex gap-[3px] mb-7 opacity-55">
-                {room.swatches.map((color, i) => (
-                  <motion.div
-                    key={i}
-                    className="w-5 md:w-7 h-16 md:h-24"
-                    style={{ backgroundColor: color }}
-                    initial={{ scaleY: 0, originY: 1 }}
-                    animate={{ scaleY: 1 }}
-                    transition={{ delay: i * 0.06 + 0.15, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                  />
-                ))}
-              </div>
-              <p className="font-sans tracking-[0.4em] font-light mb-2 opacity-80"
-                style={{ fontSize: "9px", color: room.accentColor }}>
-                {room.subtitle}
-              </p>
-              <h3 className="font-serif font-black text-brand-white text-3xl md:text-5xl tracking-wider opacity-85">
-                {room.title}
-              </h3>
-            </motion.div>
+            {/* Door swings */}
+            {/* Entrance door swing (main entry) */}
+            <path d="M330,440 A55,55 0 0 1 385,440" fill="none" stroke={WL} strokeWidth={0.7} opacity={0.7} />
+            <line x1={330} y1={440} x2={330} y2={430} stroke={WL} strokeWidth={0.5} opacity={0.5} />
+            {/* Consult room door */}
+            <path d="M68,260 A22,22 0 0 1 90,238" fill="none" stroke={WL} strokeWidth={0.7} opacity={0.6} />
+            <line x1={68} y1={260} x2={68} y2={249} stroke={WL} strokeWidth={0.5} opacity={0.5} />
+            {/* Mixing room door */}
+            <path d="M268,260 A22,22 0 0 0 290,238" fill="none" stroke={WL} strokeWidth={0.7} opacity={0.6} />
+            <line x1={290} y1={260} x2={290} y2={249} stroke={WL} strokeWidth={0.5} opacity={0.5} />
+            {/* Storage door */}
+            <path d="M490,260 A22,22 0 0 0 512,238" fill="none" stroke={WL} strokeWidth={0.7} opacity={0.6} />
+            <line x1={490} y1={260} x2={490} y2={249} stroke={WL} strokeWidth={0.5} opacity={0.5} />
+            {/* Display hall to color wall internal opening */}
+            <path d="M440,80 A30,30 0 0 0 470,110" fill="none" stroke={WL} strokeWidth={0.7} opacity={0.6} />
+            <line x1={440} y1={80} x2={451} y2={80} stroke={WL} strokeWidth={0.5} opacity={0.5} />
 
-            {/* Layer 3 — foreground tags / fastest parallax */}
-            <motion.div
-              className="absolute inset-0"
-              style={{ x: fastX, y: fastY }}
-            >
-              <AnimatePresence>
-                {room.tags.map((tag, i) => (
-                  <motion.div
-                    key={`${room.id}-tag-${i}`}
-                    className="absolute pointer-events-none"
-                    style={{ left: `${tag.x}%`, top: `${tag.y}%` }}
-                    initial={{ opacity: 0, scale: 0.88 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ delay: i * 0.12 + 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            {/* Entrance vestibule interior lines */}
+            <line x1={330} y1={440} x2={330} y2={480} stroke={W} strokeWidth={0.5} strokeDasharray="0" opacity={0} />
+            <text x={380} y={463} textAnchor="middle" dominantBaseline="middle"
+              fill="#C6A45C" fontSize={13} letterSpacing={4} opacity={0.65} fontFamily="sans-serif">
+              入口
+            </text>
+            {/* Entrance arrow */}
+            <line x1={380} y1={473} x2={380} y2={488} stroke="#C6A45C" strokeWidth={0.8} opacity={0.45} />
+            <path d="M375,484 L380,490 L385,484" fill="none" stroke="#C6A45C" strokeWidth={0.8} opacity={0.45} />
+
+            {/* North indicator */}
+            <g transform="translate(720,34)">
+              <circle cx={0} cy={0} r={12} fill="none" stroke={W} strokeWidth={0.8} />
+              <line x1={0} y1={-8} x2={0} y2={8} stroke="#C6A45C" strokeWidth={1} opacity={0.55} />
+              <text x={0} y={-14} textAnchor="middle" fill="#C6A45C" fontSize={10} opacity={0.55} fontFamily="sans-serif">N</text>
+            </g>
+
+            {/* Corner dots */}
+            {([[20,20],[740,20],[20,440],[740,440]] as [number,number][]).map(([x,y],i) => (
+              <circle key={i} cx={x} cy={y} r={2.5} fill={W} opacity={0.6} />
+            ))}
+
+            {/* Room hotspots + labels */}
+            {ROOMS.map((room) => {
+              const isActive = activeId === room.id;
+              return (
+                <g
+                  key={room.id}
+                  className="cursor-pointer"
+                  onClick={() => setActiveId(prev => prev === room.id ? null : room.id)}
+                >
+                  {/* Click area */}
+                  <path d={room.fillPath} fill="transparent" />
+                  {/* Circle */}
+                  <circle
+                    cx={room.hotspot.x}
+                    cy={room.hotspot.y}
+                    r={17}
+                    fill={isActive ? room.accentColor : "#0D0D0D"}
+                    stroke={room.accentColor}
+                    strokeWidth={isActive ? 0 : 0.8}
+                    opacity={isActive ? 1 : 0.75}
+                    style={{ transition: "all 0.25s" }}
+                  />
+                  {/* Number */}
+                  <text
+                    x={room.hotspot.x}
+                    y={room.hotspot.y}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill={isActive ? "#0D0D0D" : room.accentColor}
+                    fontSize={11}
+                    fontFamily="Georgia, serif"
+                    fontWeight="bold"
                   >
-                    <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm border border-white/10 px-3 py-1.5">
-                      <div className="w-1 h-1 flex-shrink-0" style={{ background: room.accentColor }} />
-                      <span className="text-white/80 font-sans text-[10px] tracking-[0.18em] whitespace-nowrap">
-                        {tag.text}
-                      </span>
-                    </div>
-                    <div className="w-[1px] h-5 mx-auto opacity-20" style={{ background: room.accentColor }} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </motion.div>
-
-            {/* Room number watermark */}
-            <div className="absolute top-3 left-4 md:top-5 md:left-6 pointer-events-none select-none">
-              <span className="font-serif font-black opacity-[0.06]"
-                style={{ fontSize: "clamp(56px,10vw,110px)", color: room.accentColor, lineHeight: 1 }}>
-                {room.num}
-              </span>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Navigation arrows */}
-        {[{ dir: -1, label: "←", side: "left-3" }, { dir: 1, label: "→", side: "right-3" }].map(({ dir, label, side }) => (
-          <button
-            key={dir}
-            onClick={() => goTo((roomIdx + dir + ROOMS.length) % ROOMS.length)}
-            className={`absolute ${side} top-1/2 -translate-y-1/2 z-10 w-9 h-9 border border-white/15 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white/50 hover:border-brand-gold hover:text-brand-gold transition-all text-sm`}
-          >
-            {label}
-          </button>
-        ))}
-
-        {/* Dot nav */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-          {ROOMS.map((r, i) => (
-            <button
-              key={r.id}
-              onClick={() => goTo(i)}
-              className="transition-all duration-300 h-[2px]"
-              style={{
-                width: i === roomIdx ? 22 : 6,
-                background: i === roomIdx ? room.accentColor : "rgba(255,255,255,0.18)",
-              }}
-            />
-          ))}
-        </div>
+                    {room.num}
+                  </text>
+                  {/* Label below */}
+                  <text
+                    x={room.hotspot.x}
+                    y={room.hotspot.y + 27}
+                    textAnchor="middle"
+                    fill={isActive ? room.accentColor : "#706C68"}
+                    fontSize={9}
+                    letterSpacing={1.5}
+                    fontFamily="sans-serif"
+                    style={{ transition: "fill 0.25s" }}
+                  >
+                    {room.label}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        </motion.div>
       </div>
 
       {/* Info strip */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={room.id + "-info"}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-4 md:px-8 mt-6"
-        >
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <span className="font-sans text-[9px] tracking-[0.3em]" style={{ color: room.accentColor }}>
-                {room.num}
-              </span>
-              <h4 className="font-serif font-bold text-brand-white text-lg tracking-wider">{room.label}</h4>
-            </div>
-            <p className="text-brand-muted text-xs font-light max-w-sm leading-relaxed">{room.desc}</p>
-          </div>
-          <a
-            href="#contact"
-            className="flex-shrink-0 border text-[10px] tracking-[0.3em] px-5 py-2.5 font-sans transition-colors hover:bg-white/5"
-            style={{ borderColor: room.accentColor + "55", color: room.accentColor }}
-          >
-            預約參觀 →
-          </a>
-        </motion.div>
-      </AnimatePresence>
+      <div className="px-4 md:px-8 mt-5">
+        <AnimatePresence mode="wait">
+          {active ? (
+            <motion.div
+              key={active.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-t pt-5"
+              style={{ borderColor: active.accentColor + "35" }}
+            >
+              <div>
+                <p className="font-sans text-[9px] tracking-[0.35em] mb-1" style={{ color: active.accentColor }}>
+                  {active.num} · {active.subtitle}
+                </p>
+                <h4 className="font-serif font-bold text-brand-white text-lg tracking-wider mb-1">
+                  {active.label}
+                </h4>
+                <p className="text-brand-muted text-xs font-light max-w-sm leading-relaxed mb-3">
+                  {active.desc}
+                </p>
+                <div className="flex gap-2 flex-wrap">
+                  {active.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-[9px] tracking-[0.18em] px-2 py-1 font-sans"
+                      style={{ border: `1px solid ${active.accentColor}40`, color: active.accentColor + "BB" }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <a
+                href="#contact"
+                className="flex-shrink-0 text-[10px] tracking-[0.3em] px-5 py-2.5 font-sans hover:bg-white/5 transition-colors"
+                style={{ border: `1px solid ${active.accentColor}55`, color: active.accentColor }}
+              >
+                預約參觀 →
+              </a>
+            </motion.div>
+          ) : (
+            <motion.p
+              key="hint"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-brand-faint text-[10px] tracking-[0.25em] font-sans border-t border-brand-raw/20 pt-5"
+            >
+              點擊平面圖各區域了解詳情 · CLICK TO EXPLORE
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
     </section>
   );
 }
